@@ -35,9 +35,9 @@ public final class CipherUtil {
       byte[] mdbytes = md.digest();
       StringBuilder sb = new StringBuilder();
       int max = mdbytes.length;
-      for (int i = 0; i < max; i++) {
+      for (byte mdbyte : mdbytes) {
         sb.append(
-            Integer.toString((mdbytes[i] & HEX_FF) + HEX_100, CipherConstants.BASE_BUILD)
+            Integer.toString((mdbyte & HEX_FF) + HEX_100, CipherConstants.BASE_BUILD)
                 .substring(NumericConstants.ONE));
       }
       return sb.toString();
@@ -46,50 +46,67 @@ public final class CipherUtil {
     }
   }
 
-  public static String encode(String source, String salt, DigestAlgorithm digestAlgorithm,
+  public static String encode(
+      String source,
+      String salt,
+      DigestAlgorithm digestAlgorithm,
       CipherAlgorithm cypherAlgorithm) {
     return encode(source, salt, digestAlgorithm, cypherAlgorithm, 1);
   }
 
-  public static String encode(String source, String salt, DigestAlgorithm digestAlgorithm,
-      CipherAlgorithm cipherAlgorithm, int encodeTimes) {
+  public static String encode(
+      String source,
+      String salt,
+      DigestAlgorithm digestAlgorithm,
+      CipherAlgorithm cipherAlgorithm,
+      int encodeTimes) {
     try {
-      byte[] buf = executeCipher(
-          source.getBytes(StandardCharsets.UTF_8),
-          salt,
-          digestAlgorithm,
-          cipherAlgorithm,
-          encodeTimes,
-          Cipher.ENCRYPT_MODE);
+      byte[] buf =
+          executeCipher(
+              source.getBytes(StandardCharsets.UTF_8),
+              salt,
+              digestAlgorithm,
+              cipherAlgorithm,
+              encodeTimes,
+              Cipher.ENCRYPT_MODE);
       return Base64.getEncoder().encodeToString(buf);
     } catch (Exception e) {
       throw new TechnicalException(e);
     }
   }
 
-  public static String decode(String source, String salt, DigestAlgorithm digestAlgorithm,
+  public static String decode(
+      String source,
+      String salt,
+      DigestAlgorithm digestAlgorithm,
       CipherAlgorithm cypherAlgorithm) {
     return decode(source, salt, digestAlgorithm, cypherAlgorithm, 1);
   }
 
-  public static String decode(String source, String salt, DigestAlgorithm digestAlgorithm,
-      CipherAlgorithm cipherAlgorithm, int decodeTimes) {
+  public static String decode(
+      String source,
+      String salt,
+      DigestAlgorithm digestAlgorithm,
+      CipherAlgorithm cipherAlgorithm,
+      int decodeTimes) {
     try {
-      byte[] buf = executeCipher(
-          Base64.getDecoder().decode(source.getBytes(StandardCharsets.UTF_8)),
-          salt,
-          digestAlgorithm,
-          cipherAlgorithm,
-          decodeTimes,
-          Cipher.DECRYPT_MODE);
+      byte[] buf =
+          executeCipher(
+              Base64.getDecoder().decode(source.getBytes(StandardCharsets.UTF_8)),
+              salt,
+              digestAlgorithm,
+              cipherAlgorithm,
+              decodeTimes,
+              Cipher.DECRYPT_MODE);
       return new String(buf, StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new TechnicalException(e);
     }
   }
 
-  private static SecretKey getKey(String salt, DigestAlgorithm digestAlgorithm,
-      CipherAlgorithm cypherAlgorithm) throws NoSuchAlgorithmException {
+  private static SecretKey getKey(
+      String salt, DigestAlgorithm digestAlgorithm, CipherAlgorithm cypherAlgorithm)
+      throws NoSuchAlgorithmException {
     String cypherKey = salt == null ? CipherConstants.SECRET_KEY : salt;
     MessageDigest digester = MessageDigest.getInstance(digestAlgorithm.getAlgorithm());
     byte[] cypherKeyBytes = digester.digest(cypherKey.getBytes(StandardCharsets.UTF_8));
@@ -97,8 +114,14 @@ public final class CipherUtil {
     return new SecretKeySpec(cypherKeyBytes, cypherAlgorithm.getKeyAlgorithm());
   }
 
-  private static byte[] executeCipher(byte[] sourceBuffer, String salt, DigestAlgorithm digestAlgorithm,
-      CipherAlgorithm cypherAlgorithm, int cipherTimes, int cipherMode) throws Exception {
+  private static byte[] executeCipher(
+      byte[] sourceBuffer,
+      String salt,
+      DigestAlgorithm digestAlgorithm,
+      CipherAlgorithm cypherAlgorithm,
+      int cipherTimes,
+      int cipherMode)
+      throws Exception {
     SecretKey key = getKey(salt, digestAlgorithm, cypherAlgorithm);
     Cipher cipher = Cipher.getInstance(cypherAlgorithm.getAlgorithm());
     cipher.init(cipherMode, key);
