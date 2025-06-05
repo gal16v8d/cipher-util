@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 public enum CipherAlgorithm {
   AES("AES", "AES", 16),
   AES_WITH_PADDING("AES/ECB/PKCS5Padding", "AES", 16),
-  DESEDE("DESede", "DESede", 24),
-  PBEWITHSHA1ANDDESEDE("PBEWITHSHA1ANDDESEDE", "PBEWITHSHA1ANDDESEDE", 24);
+  DES_EDE("DESede", "DESede", 24),
+  PBE_WITH_SHA1_AND_DES_EDE("PBEWITHSHA1ANDDESEDE", "PBEWITHSHA1ANDDESEDE", 24);
 
   private final String algorithm;
   private final String keyAlgorithm;

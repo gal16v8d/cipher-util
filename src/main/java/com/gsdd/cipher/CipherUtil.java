@@ -24,7 +24,7 @@ public final class CipherUtil {
     try (FileInputStream fis = new FileInputStream(file)) {
       int r = buffer != null ? buffer : CipherConstants.BYTE_RATE;
       byte[] dataBytes = new byte[r];
-      int nread = NumericConstants.ZERO;
+      int nread;
       MessageDigest md = MessageDigest.getInstance(algorithm);
       if (salt != null) {
         md.update(salt.getBytes());
@@ -32,12 +32,11 @@ public final class CipherUtil {
       while ((nread = fis.read(dataBytes)) != NumericConstants.MINUS_ONE) {
         md.update(dataBytes, NumericConstants.ZERO, nread);
       }
-      byte[] mdbytes = md.digest();
+      byte[] mdBytes = md.digest();
       StringBuilder sb = new StringBuilder();
-      int max = mdbytes.length;
-      for (byte mdbyte : mdbytes) {
+      for (byte mdByte : mdBytes) {
         sb.append(
-            Integer.toString((mdbyte & HEX_FF) + HEX_100, CipherConstants.BASE_BUILD)
+            Integer.toString((mdByte & HEX_FF) + HEX_100, CipherConstants.BASE_BUILD)
                 .substring(NumericConstants.ONE));
       }
       return sb.toString();
